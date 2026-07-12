@@ -642,13 +642,30 @@
     }
     formData.append('payload_json', JSON.stringify(payload));
 
-    const res = await fetch(webhookUrl, {
-      method: 'POST',
-      body: formData
-    });
+    let res;
+    try{
+      res = await fetch(webhookUrl, {
+        method: 'POST',
+        body: formData
+      });
+    }catch(networkErr){
+      // fetch() reddedildiğinde (CORS, ağ, file:// kökeni vb.) buraya düşer
+      console.error('Webhook network error:', networkErr);
+      throw new Error(
+        'NETWORK: İstek Discord\'a hiç ulaşamadı. Genelde şu sebeplerden olur: ' +
+        '(1) HTML dosyasını çift tıklayıp file:// olarak açtın — bunun yerine bir web sunucusundan ' +
+        '(GitHub Pages, Netlify, Vercel, basit bir http server) yayınla; (2) internet bağlantısı yok; ' +
+        '(3) tarayıcı eklentisi/adblock isteği engelliyor. Orijinal hata: ' + networkErr.message
+      );
+    }
+
     if(!res.ok){
       const text = await res.text().catch(()=> '');
-      throw new Error('Discord webhook hatası: ' + res.status + ' ' + text);
+      let reason = 'HTTP ' + res.status;
+      if(res.status === 404) reason += ' — Webhook bulunamadı. Webhook silinmiş veya URL hatalı olabilir.';
+      else if(res.status === 401) reason += ' — Webhook tokenı geçersiz.';
+      else if(res.status === 429) reason += ' — Discord\'a çok hızlı istek atıldı (rate limit). Biraz bekleyip tekrar dene.';
+      throw new Error(reason + (text ? ' — ' + text : ''));
     }
   }
 
@@ -716,7 +733,7 @@
       dPreview.style.display = 'none';
     }catch(err){
       statusBox.classList.add('err');
-      statusBox.textContent = 'Gönderim sırasında bir hata oluştu. Lütfen tekrar dene.';
+      statusBox.textContent = 'Gönderim başarısız: ' + err.message;
       showToast('Bir hata oluştu ✕');
       console.error(err);
     }finally{
@@ -772,7 +789,7 @@
       document.querySelectorAll('#yesnoRow .yesno-opt').forEach(o => o.classList.remove('selected'));
     }catch(err){
       statusBox.classList.add('err');
-      statusBox.textContent = 'Gönderim sırasında bir hata oluştu. Lütfen tekrar dene.';
+      statusBox.textContent = 'Gönderim başarısız: ' + err.message;
       showToast('Bir hata oluştu ✕');
       console.error(err);
     }finally{
