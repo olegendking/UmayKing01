@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>UmayKing Gaming | Resmi Oyun Sunucusu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0c10;
+            --bg-secondary: #11151d;
+            --accent: #00f2fe;
+            --accent2: #4facfe;
+            --gold: #f0b90b;
+            --text: #e0e0e0;
+            --text-muted: #8892a4;
+            --card-bg: rgba(20, 25, 35, 0.8);
+            --border: rgba(255, 255, 255, 0.08);
+            --glow: 0 0 15px rgba(0, 242, 254, 0.4);
+            --error: #ff4d6a;
+            --success: #2ecc71;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(0, 242, 254, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 75%, rgba(79, 172, 254, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse at 40% 50%, rgba(240, 185, 11, 0.03) 0%, transparent 50%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.35;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 12, 16, 0.75);
+            border-bottom: 1px solid var(--border);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1300px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo i {
+            -webkit-text-fill-color: var(--accent);
+            font-size: 2rem;
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.2rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+        .nav-links a:hover,
+        .nav-links a.active-link {
+            color: white;
+        }
+        .nav-links a:hover::after,
+        .nav-links a.active-link::after {
+            width: 100%;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 102;
+        }
+        .hamburger span {
+            width: 28px;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+            transition: 0.3s;
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            animation: fadeIn 0.4s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        .hero-content h1 {
+            font-size: clamp(2.8rem, 7vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(to right, #ffffff, #b0d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+        .hero-content p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 2.5rem;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            padding: 0.9rem 2.4rem;
+            border-radius: 3rem;
+            font-weight: 700;
+            color: #0a0c10;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: var(--glow);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.5);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            padding: 0.9rem 2.4rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: 0.3s;
+        }
+        .btn-outline:hover {
+            background: rgba(0, 242, 254, 0.1);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+
+        .features {
+            padding: 4rem 0;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #c0e0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem 1.8rem;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 242, 254, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 242, 254, 0.15);
+        }
+        .feature-icon {
+            font-size: 2.8rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 8px var(--accent));
+        }
+
+        .form-page-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            padding: 2rem 0;
+        }
+        .form-wrapper {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 650px;
+        }
+        .form-wrapper h3 {
+            font-size: 2rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .form-wrapper .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+            color: #ccd6e0;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 1rem;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.25);
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-group input[type="file"] {
+            padding: 0.7rem 0.9rem;
+            background: rgba(255,255,255,0.03);
+            cursor: pointer;
+            color: #b0b0b0;
+        }
+        .form-group input[type="file"]::file-selector-button {
+            background: var(--accent);
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            color: #0a0c10;
+            font-weight: 600;
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            border-radius: 2.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #0a0c10;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(0, 242, 254, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: 0.3s;
+        }
+        .submit-btn.staff-submit {
+            background: linear-gradient(135deg, #f0b90b, #f59e0b);
+            box-shadow: 0 4px 18px rgba(240,185,11,0.35);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.2);
+            border-top: 3px solid #0a0c10;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1e2530;
+            border-left: 5px solid var(--accent);
+            color: white;
+            padding: 1rem 1.8rem;
+            border-radius: 1rem;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            z-index: 999;
+            font-weight: 500;
+            transform: translateX(120%);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            backdrop-filter: blur(10px);
+            max-width: 90vw;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast.error {
+            border-left-color: var(--error);
+        }
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            background: rgba(10,12,16,0.6);
+            margin-top: auto;
+        }
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 75%;
+                max-width: 320px;
+                height: 100vh;
+                background: rgba(10,12,16,0.95);
+                backdrop-filter: blur(25px);
+                flex-direction: column;
+                justify-content: center;
+                gap: 2.5rem;
+                transition: 0.4s ease;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.7);
+                padding: 2rem;
+            }
+            .nav-links.active {
+                right: 0;
+            }
+            .form-wrapper {
+                padding: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-gamepad"></i> UmayKing
+            </div>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Menü">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a data-page="home" class="active-link"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+                <li><a data-page="support"><i class="fas fa-headset"></i> Destek</a></li>
+                <li><a data-page="staff"><i class="fas fa-user-shield"></i> Başvuru</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="page-home" class="page active">
+        <section class="hero">
+            <div class="hero-content container">
+                <h1>UmayKing Gaming<br>Efsane Başlıyor</h1>
+                <p>Yüksek performanslı sunucular, benzersiz oyun modları ve sıkı bir topluluk. UmayKing evrenine katıl, sınırları zorla.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary nav-trigger" data-page="support"><i class="fas fa-headset"></i> Destek Al</button>
+                    <button class="btn-outline nav-trigger" data-page="staff"><i class="fas fa-user-shield"></i> Yetkili Ol</button>
+                </div>
+            </div>
+        </section>
+        <section class="features container">
+            <div class="section-title">
+                <h2>Neden UmayKing?</h2>
+                <p>Oyuncular için özenle tasarlanmış üstün özellikler.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-rocket"></i></div><h3>Ultra Performans</h3><p>Düşük ping, yüksek tick rate ve optimize altyapı.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-shield-haltered"></i></div><h3>Gelişmiş Anti-Cheat</h3><p>Özel güvenlik katmanı ile hileye karşı tam koruma.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-users"></i></div><h3>Aktif Topluluk</h3><p>Discord entegrasyonu ve rekabetçi ligler.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-crown"></i></div><h3>Özel Oyun Modları</h3><p>Başka hiçbir yerde bulamayacağın benzersiz modlar.</p></div>
+            </div>
+        </section>
+    </div>
+
+    <div id="page-support" class="page">
+        <div class="form-page-container container">
+            <div class="form-wrapper">
+                <h3><i class="fas fa-life-ring" style="color: var(--accent);"></i> Destek Talebi</h3>
+                <p class="subtitle">Sorununu bildir, ekibimiz en kısa sürede yardımcı olsun.</p>
+                <form id="supportForm" novalidate>
+                    <div class="form-group"><label>Adınız *</label><input type="text" id="supName" placeholder="Ahmet Yılmaz" required></div>
+                    <div class="form-group"><label>Discord Adınız *</label><input type="text" id="supDiscord" placeholder="kullanici#1234" required></div>
+                    <div class="form-group"><label>Öncelik Durumu *</label><select id="supPriority" required><option value="" disabled selected>Seçiniz</option><option value="Düşük">🟢 Düşük</option><option value="Orta">🟡 Orta</option><option value="Yüksek">🟠 Yüksek</option><option value="Acil">🔴 Acil</option></select></div>
+                    <div class="form-group"><label>Şikayetiniz *</label><textarea id="supComplaint" placeholder="Yaşadığınız sorunu detaylıca açıklayın..." required></textarea></div>
+                    <div class="form-group"><label>Şikayet Kanıtı (Görsel) <span style="color: var(--text-muted);">- opsiyonel</span></label><input type="file" id="supEvidence" accept="image/*"><div class="file-info">Maksimum 8MB, PNG, JPG, GIF</div></div>
+                    <button type="submit" class="submit-btn" id="supportSubmitBtn"><i class="fas fa-paper-plane"></i> Gönder <span class="spinner" id="supportSpinner"></span></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-staff" class="page">
+        <div class="form-page-container container">
+            <div class="form-wrapper">
+                <h3><i class="fas fa-gavel" style="color: var(--gold);"></i> Yetkili Başvurusu</h3>
+                <p class="subtitle">Ekibimize katıl, sunucuyu birlikte yönetelim.</p>
+                <form id="staffForm" novalidate>
+                    <div class="form-group"><label>Adınız *</label><input type="text" id="staffName" placeholder="Mehmet Kaya" required></div>
+                    <div class="form-group"><label>Yaşınız *</label><input type="number" id="staffAge" placeholder="18" min="16" max="99" required></div>
+                    <div class="form-group"><label>Discord Adınız *</label><input type="text" id="staffDiscord" placeholder="kullanici#1234" required></div>
+                    <div class="form-group"><label>Daha Önceki Yetkili Deneyiminiz *</label><textarea id="staffExperience" placeholder="Hangi sunucularda, ne tür görevlerde bulundunuz?" required></textarea></div>
+                    <div class="form-group"><label>Diğer yetkililerle iyi anlaşabilir misiniz? *</label><select id="staffTeamwork" required><option value="" disabled selected>Seçiniz</option><option value="Evet, çok iyi anlaşırım">Evet, çok iyi anlaşırım</option><option value="Genellikle iyi anlaşırım">Genellikle iyi anlaşırım</option><option value="Emin değilim">Emin değilim</option><option value="Hayır, bireysel çalışmayı tercih ederim">Hayır, bireysel çalışmayı tercih ederim</option></select></div>
+                    <button type="submit" class="submit-btn staff-submit" id="staffSubmitBtn"><i class="fas fa-crown"></i> Başvuruyu Gönder <span class="spinner" id="staffSpinner"></span></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 UmayKing Gaming. Tüm hakları saklıdır. | Discord: <a href="https://discord.gg/HpgygsQ26E" target="_blank">discord.gg/HpgygsQ26E</a></p>
+    </footer>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle" id="toastIcon"></i>
+        <span id="toastMsg"></span>
+    </div>
+
+    <script>
+        (function() {
+            const SUPPORT_WEBHOOK_URL = 'https://discord.com/api/webhooks/1525948539883225088/kBtkAU2DDPyadD50EML5aqRd9z3-oWQrKuC1JQNLaHLsWD9KpZKx7npsev0GHV0nfYsC';
+            const STAFF_WEBHOOK_URL = 'https://discord.com/api/webhooks/1525948839062929441/p530HbDN2doQvhUGrpbx2sI-dIlBc0gwJFnVD_ZUpPUCNlYEB9MqeWWpN3DOWZU7aE76';
+
+            // Sayfa yönetimi
+            const pages = document.querySelectorAll('.page');
+            const navLinksAll = document.querySelectorAll('.nav-links a[data-page]');
+            const navTriggers = document.querySelectorAll('.nav-trigger[data-page]');
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const navLinksContainer = document.getElementById('navLinks');
+
+            function switchPage(pageId) {
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById('page-' + pageId)?.classList.add('active');
+                navLinksAll.forEach(link => {
+                    link.classList.remove('active-link');
+                    if (link.getAttribute('data-page') === pageId) link.classList.add('active-link');
+                });
+                navLinksContainer.classList.remove('active');
+                window.location.hash = pageId;
+            }
+
+            navLinksAll.forEach(link => link.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchPage(link.getAttribute('data-page'));
+            }));
+            navTriggers.forEach(btn => btn.addEventListener('click', () => switchPage(btn.getAttribute('data-page'))));
+            window.addEventListener('hashchange', () => {
+                const hash = window.location.hash.substring(1);
+                switchPage(hash || 'home');
+            });
+            switchPage(window.location.hash.substring(1) || 'home');
+            hamburgerBtn.addEventListener('click', () => navLinksContainer.classList.toggle('active'));
+
+            // Toast
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+            function showToast(message, type = 'success') {
+                toastMsg.textContent = message;
+                toast.className = 'toast ' + type + ' show';
+                toastIcon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+                setTimeout(() => toast.classList.remove('show'), 5000);
+            }
+
+            function setLoading(btn, spinner, isLoading) {
+                btn.disabled = isLoading;
+                spinner.style.display = isLoading ? 'inline-block' : 'none';
+            }
+
+            // Destek formu
+            document.getElementById('supportForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('supName').value.trim();
+                const discord = document.getElementById('supDiscord').value.trim();
+                const priority = document.getElementById('supPriority').value;
+                const complaint = document.getElementById('supComplaint').value.trim();
+                const fileInput = document.getElementById('supEvidence');
+                const file = fileInput.files[0];
+
+                if (!name || !discord || !priority || !complaint) {
+                    showToast('Lütfen tüm zorunlu alanları doldurun.', 'error');
+                    return;
+                }
+                if (file && file.size > 8 * 1024 * 1024) {
+                    showToast('Dosya boyutu 8MB\'ı aşamaz.', 'error');
+                    return;
+                }
+
+                const btn = document.getElementById('supportSubmitBtn');
+                const spinner = document.getElementById('supportSpinner');
+                setLoading(btn, spinner, true);
+
+                const embed = {
+                    title: '📩 Yeni Destek Talebi',
+                    color: 0x00f2fe,
+                    fields: [
+                        { name: '👤 Ad', value: name, inline: true },
+                        { name: '🎮 Discord', value: discord, inline: true },
+                        { name: '⚠️ Öncelik', value: priority, inline: true },
+                        { name: '📝 Şikayet', value: complaint, inline: false }
+                    ],
+                    footer: { text: 'UmayKing Destek Sistemi' },
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    const formData = new FormData();
+                    if (file) formData.append('file', file, file.name);
+                    formData.append('payload_json', JSON.stringify({ embeds: [embed] }));
+                    const res = await fetch(SUPPORT_WEBHOOK_URL, { method: 'POST', body: formData });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    showToast('✅ Destek talebiniz başarıyla gönderildi!', 'success');
+                    document.getElementById('supportForm').reset();
+                } catch (err) {
+                    console.error(err);
+                    showToast('❌ Gönderim sırasında bir hata oluştu. Lütfen tekrar deneyin.', 'error');
+                    document.getElementById('supportForm').reset(); // hata olsa da form temizlensin
+                } finally {
+                    setLoading(btn, spinner, false);
+                }
+            });
+
+            // Yetkili başvuru formu
+            document.getElementById('staffForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('staffName').value.trim();
+                const age = document.getElementById('staffAge').value.trim();
+                const discord = document.getElementById('staffDiscord').value.trim();
+                const experience = document.getElementById('staffExperience').value.trim();
+                const teamwork = document.getElementById('staffTeamwork').value;
+
+                if (!name || !age || !discord || !experience || !teamwork) {
+                    showToast('Lütfen tüm zorunlu alanları doldurun.', 'error');
+                    return;
+                }
+                if (isNaN(age) || parseInt(age) < 16 || parseInt(age) > 99) {
+                    showToast('Yaş 16-99 arasında olmalıdır.', 'error');
+                    return;
+                }
+
+                const btn = document.getElementById('staffSubmitBtn');
+                const spinner = document.getElementById('staffSpinner');
+                setLoading(btn, spinner, true);
+
+                const embed = {
+                    title: '🛡️ Yeni Yetkili Başvurusu',
+                    color: 0xf0b90b,
+                    fields: [
+                        { name: '👤 Ad', value: name, inline: true },
+                        { name: '🎂 Yaş', value: age, inline: true },
+                        { name: '🎮 Discord', value: discord, inline: true },
+                        { name: '📜 Deneyim', value: experience, inline: false },
+                        { name: '🤝 Diğer Yetkililerle Anlaşma', value: teamwork, inline: false }
+                    ],
+                    footer: { text: 'UmayKing Yetkili Başvuru Sistemi' },
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    const res = await fetch(STAFF_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ embeds: [embed] })
+                    });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    showToast('✅ Başvurunuz başarıyla gönderildi!', 'success');
+                    document.getElementById('staffForm').reset();
+                } catch (err) {
+                    console.error(err);
+                    showToast('❌ Başvuru gönderilirken hata oluştu. Lütfen tekrar deneyin.', 'error');
+                    document.getElementById('staffForm').reset();
+                } finally {
+                    setLoading(btn, spinner, false);
+                }
+            });
+
+            // Parçacık efekti (aynı kaldı)
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationFrameId;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+
+            class Particle {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2.2 + 0.6;
+                    this.speedX = (Math.random() - 0.5) * 0.45;
+                    this.speedY = (Math.random() - 0.5) * 0.45;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                    ctx.fillStyle = `rgba(0, 242, 254, ${this.opacity})`;
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                const count = Math.min(80, Math.floor((canvas.width * canvas.height) / 12000));
+                for (let i = 0; i < count; i++) particles.push(new Particle());
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i+1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx*dx+dy*dy);
+                        if (dist < 110) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(79, 172, 254, ${0.06*(1-dist/110)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                animationFrameId = requestAnimationFrame(animateParticles);
+            }
+
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) cancelAnimationFrame(animationFrameId);
+                else animateParticles();
+            });
+        })();
+    </script>
+</body>
+</html>
